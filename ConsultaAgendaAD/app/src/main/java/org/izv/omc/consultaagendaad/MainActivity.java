@@ -268,18 +268,6 @@ public class MainActivity extends AppCompatActivity {
             search();
         }
     }
-    
-    public String soloNumero(String numero) {
-        char [] cadena_div = numero.toCharArray();
-        String n="";
-        for (int i = 0; i < cadena_div.length; i++) {
-            if (Character.isDigit(cadena_div[i])){
-                n+=cadena_div[i];
-            }
-        }
-
-        return n;
-    }
 
     private void showRationaleDialog(String title, String message, String permission, int requestCode) {
 
@@ -303,6 +291,18 @@ public class MainActivity extends AppCompatActivity {
 
         builder.create().show();
 
+    }
+    
+    public String soloNumero(String numero) {
+        char [] cadena_div = numero.toCharArray();
+        String n="";
+        for (int i = 0; i < cadena_div.length; i++) {
+            if (Character.isDigit(cadena_div[i])){
+                n+=cadena_div[i];
+            }
+        }
+
+        return n;
     }
 
     private void viewSettings() {
