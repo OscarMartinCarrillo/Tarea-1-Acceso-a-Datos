@@ -248,18 +248,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public String soloNumero(String numero) {
-        char [] cadena_div = numero.toCharArray();
-        String n="";
-        for (int i = 0; i < cadena_div.length; i++) {
-            if (Character.isDigit(cadena_div[i])){
-                n+=cadena_div[i];
-            }
-        }
-
-        return n;
-    }
-
     private void searchIfPermitted() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             //Android es posterior o igual que la 6.0 incluida
@@ -279,6 +267,18 @@ public class MainActivity extends AppCompatActivity {
             //Ya tengo el permiso
             search();
         }
+    }
+    
+    public String soloNumero(String numero) {
+        char [] cadena_div = numero.toCharArray();
+        String n="";
+        for (int i = 0; i < cadena_div.length; i++) {
+            if (Character.isDigit(cadena_div[i])){
+                n+=cadena_div[i];
+            }
+        }
+
+        return n;
     }
 
     private void showRationaleDialog(String title, String message, String permission, int requestCode) {
