@@ -10,17 +10,15 @@ import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
-import android.provider.UserDictionary;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,68 +29,38 @@ import org.izv.omc.consultaagendaad.settings.SettingsActivity;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
-
-    private final String TAG = "xyzyx";
-    /*
-
-        No podemos hacer referencia a elementos que no se han creado
-
-        private Button btSearch = findViewById(R.id.btSearch);
-        private EditText etPhone = findViewById(R.id.etPhone);
-        private TextView tvResult = findViewById(R.id.tvResult);
-        */
     private final int CONTACTS_PERMISSION = 1;
-
     private Button btSearch;
     private EditText etPhone;
     private TextView tvResult;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.v(TAG, "onCreate");//verbose
         initialize();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
+        //Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu, menu);
         return true;
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.v(TAG, "onDestroy");//verbose
-
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.action_ajustes) {
             viewSettings();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.v(TAG, "onPause");//verbose
-
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        Log.v(TAG, "onRequestPermissionsResult");//verbose
         switch (requestCode) {
             case CONTACTS_PERMISSION:
                 if (grantResults.length > 0 &&
@@ -110,31 +78,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.v(TAG, "onRestart");//verbose
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.v(TAG, "onResume");//verbose
-
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.v(TAG, "onStart");//verbose
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.v(TAG, "onStop");//verbose
-    }
-
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void explain() {
         showRationaleDialog(getString(R.string.title),
@@ -148,12 +91,11 @@ public class MainActivity extends AppCompatActivity {
         etPhone = findViewById(R.id.etPhone);
         tvResult = findViewById(R.id.tvResult);
 
-        btSearch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                searchIfPermitted();
-            }
-        });
+        //Cargamos el contenido de las preferencias compartidas, si no hay se pone ""
+        SharedPreferences prefe=getSharedPreferences("datos",Context.MODE_PRIVATE);
+        tvResult.setText(prefe.getString("msg", ""));
+
+        btSearch.setOnClickListener(view -> searchIfPermitted());
 
     }
 
@@ -163,89 +105,54 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void search() {
-        tvResult.setText("A pelo ya si");
-        //Buscar entre los contactos
-        //ContentProvider -> Proveedor de contenidos
-        /*
-        Cursor cursor = getContentResolver().query(
-                UserDictionary.Words.CONTENT_URI,       //Ruta de la URI que queremos obtener, nos devuelve una tabla
-                new String[] {"projection"},            //Como en sql filtrar las columnas que obtenemos de la consulta, el select
-                "selectionClause",             //El where preparado de sql(mirar debajo)
-                new String[]{"selectionArgs"},          //El WHERE de SQL
-                "sortOrder");                  //El SORT de SQL
-        */
-        /*
-        Cursor cursor = getContentResolver().query(
-                UserDictionary.Words.CONTENT_URI,       //Ruta de la URI que queremos obtener, nos devuelve una tabla
-                new String[] {"projection"},            //Como en sql filtrar las columnas que obtenemos de la consulta
-                "campo1 = ? and campo2 < ? or campo3 = ? ",              //Selection criteria
-                new String[]{"pepe", "3", "23"},          //Selection criteria
-                "campo1", "campo2");
+        //Para ocultar el teclado
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        inputMethodManager.hideSoftInputFromWindow(btSearch.getWindowToken(), 0);
 
-         */
-
-        /*
-        Uri uri = ContactsContract.Contacts.CONTENT_URI;
-        String proyeccion[] = proyeccion=new String[] {ContactsContract.Contacts.DISPLAY_NAME};; //Quiero todos los campos
-        String seleccion = ContactsContract.Contacts.IN_VISIBLE_GROUP + " = ? and " +
-                ContactsContract.Contacts.HAS_PHONE_NUMBER + "= ?";
-        String argumentos[] = new String[]{"1","1"};
-        seleccion=null; //Quitamos el where
-        argumentos=null;//Quitamos los argumentos porque no hay WHERE
-        String orden = ContactsContract.Contacts.DISPLAY_NAME + " collate localized asc";
-        Cursor cursor = getContentResolver().query(uri, proyeccion, seleccion, argumentos, orden);
-        String[] columnas = cursor.getColumnNames();
-        for(String s: columnas){
-            Log.v(TAG, s);
-        }
-        String displayName;
-        int columna = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME);
-        while (cursor.moveToNext()){
-            displayName = cursor.getString(columna);
-            Log.v(TAG, displayName);
-        }
-        */
-
-        Uri uri2 = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
-        String proyeccion2[] = new String[] {ContactsContract.CommonDataKinds.Phone.NUMBER,
+        //Sacamos los contactos del telefono con una consulta
+        Uri uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI;
+        String proyeccion[] = new String[] {ContactsContract.CommonDataKinds.Phone.NUMBER,
                 ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME};
-        String seleccion2 = null;//ContactsContract.CommonDataKinds.Phone.CONTACT_ID + " = ?";
-        String argumentos2[] = null;//new String[]{id+""};
-        String orden2 = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME;
-        Cursor cursor2 = getContentResolver().query(uri2, proyeccion2, seleccion2, argumentos2, orden2);
+        String orden = ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME;
+        Cursor cursor = getContentResolver().query(uri, proyeccion, null, null, orden);
 
-        String[] columnas2 = cursor2.getColumnNames();
-        for(String s: columnas2){
-            Log.v(TAG, s);
-        }
-        int columnaNombre = cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
-        int columnaNumero = cursor2.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+        //Sacamos el numero de donde estan situados los datos que queremos
+        int columnaNombre = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME);
+        int columnaNumero = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER);
+
+        //Sacamos todos los telefonos con el nombre, formamos el numero y lo comparamos con el introducido en el EditText
         String nombre, numero;
         ArrayList<String> match = new ArrayList<String>();
-        while (cursor2.moveToNext()){
-            nombre=cursor2.getString(columnaNombre);
-            numero=cursor2.getString(columnaNumero);
-            Log.v(TAG, "Nombre: "+nombre + " Numero: " + soloNumero(numero));
-
+        while (cursor.moveToNext()){
+            nombre=cursor.getString(columnaNombre);
+            numero=cursor.getString(columnaNumero);
             if (etPhone.getText().toString().equals(soloNumero(numero))){
                 match.add(nombre);
             }
         }
 
+        //Creamos le mensaje del TextView
         String msg="";
+        //Si hay mas de 0 coincidencias
         if (match.toArray().length > 0) {
+            //Recorremos cada coincidencia y la concatenamos al string
             for (String s:match) {
-                msg+=" "+s;
+                msg=msg.concat(" "+s);
             }
         }else{
+            //Mensaje de que no hay coincidencias
             msg="No se ha encontrado el contacto";
         }
-        //Para ocultar el teclado
-        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        inputMethodManager.hideSoftInputFromWindow(btSearch.getWindowToken(), 0);
 
+        //Preferencias compartidas para almacenar el ultimo registro
+        SharedPreferences prefe=getSharedPreferences("datos",Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor=prefe.edit();
+        editor.putString("msg", msg);
+        //editor.commit(); me recomienda poner el apply en vez del commit
+        editor.apply();
+
+        //Seteamos el mensaje de salida al TextView
         tvResult.setText(msg);
-
     }
 
     private void searchIfPermitted() {
@@ -301,13 +208,12 @@ public class MainActivity extends AppCompatActivity {
                 n+=cadena_div[i];
             }
         }
-
         return n;
     }
 
     private void viewSettings() {
         //Intencion
-        //intenciones expliccitas o implicitas
+        //intenciones explicitas o implicitas
         //explicita: ir del contexto actual a un contexto que se crea con la clase SettingsActivity
         Intent intent = new Intent(this, SettingsActivity.class);
         startActivity(intent);
